@@ -170,7 +170,7 @@ nvm_do_install() {
 
   local NVM_PROFILE
   
-  SOURCE_STR="\nexport NVM_DIR=\"$NVM_DIR\"\n[ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"  # This loads nvm"
+  SOURCE_STR="\nexport NVM_DIR=\"$NVM_DIR\"\n[ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"  # This loads nvm\nnvm use stable"
   
   nvm_detect_profile "$SOURCE_STR"
   NVM_PROFILE=$?
