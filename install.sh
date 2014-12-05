@@ -31,7 +31,7 @@ nvm_source() {
   elif [ "_$NVM_METHOD" = "_script-nvm-exec" ]; then
     NVM_SOURCE="https://raw.githubusercontent.com/creationix/nvm/v0.20.0/nvm-exec"
   elif [ "_$NVM_METHOD" = "_git" ] || [ -z "$NVM_METHOD" ]; then
-    NVM_SOURCE="https://github.com/creationix/nvm.git"
+    NVM_SOURCE="https://github.com/NicCollins/nvm.git"
   else
     echo >&2 "Unexpected value \"$NVM_METHOD\" for \$NVM_METHOD"
     return 1
@@ -100,6 +100,15 @@ install_nvm_as_script() {
   }
 }
 
+nvm_add_profile() {
+  if ! grep -qc 'nvm.sh' "$1"; then
+      echo "=> Appending source string to $1"
+      printf "$2\n" >> "$1"
+    else
+      echo "=> Source string already in $1"
+    fi
+}
+
 #
 # Detect profile file if not specified as environment variable
 # (eg: PROFILE=~/.myprofile)
@@ -107,23 +116,34 @@ install_nvm_as_script() {
 # Otherwise, an empty string is returned
 #
 nvm_detect_profile() {
+  found = 1
   if [ -f "$PROFILE" ]; then
-    echo "$PROFILE"
-  elif [ -f "$HOME/.bashrc" ]; then
-    echo "$HOME/.bashrc"
-  elif [ -f "$HOME/.bash_profile" ]; then
-    echo "$HOME/.bash_profile"
-  elif [ -f "$HOME/.zshrc" ]; then
-    echo "$HOME/.zshrc"
-  elif [ -f "$HOME/.profile" ]; then
-    echo "$HOME/.profile"
+    nvm_add_profile "$PROFILE" $1
+    found = 0
+  else 
+    if [ -f "$HOME/.bashrc" ]; then
+      nvm_add_profile "$HOME/.bashrc" $1
+      found = 0
+    fi
+    if [ -f "$HOME/.bash_profile" ]; then
+      nvm_add_profile "$HOME/.bash_profile" $1
+      found = 0
+    fi
+    if [ -f "$HOME/.zshrc" ]; then
+      nvm_add_profile "$HOME/.zshrc" $1
+      found = 0
+    fi
+    if [ -f "$HOME/.profile" ]; then
+      nvm_add_profile "$HOME/.profile" $1
+      found = 0
+    fi
   fi
 }
 
 nvm_do_install() {
   if [ -z "$METHOD" ]; then
     # Autodetect install method
-    if nvm_has "git"; then
+    if nvm_has "git"; then:
       install_nvm_from_git
     elif nvm_has "nvm_download"; then
       install_nvm_as_script
@@ -145,28 +165,22 @@ nvm_do_install() {
     install_nvm_as_script
   fi
 
-  echo
+  echo "\nNVM Download Complete\n"
 
   local NVM_PROFILE
-  NVM_PROFILE=$(nvm_detect_profile)
-
+  
   SOURCE_STR="\nexport NVM_DIR=\"$NVM_DIR\"\n[ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"  # This loads nvm"
+  
+  NVM_PROFILE=$(nvm_detect_profile $SOURCE_STR)
 
-  if [ -z "$NVM_PROFILE" ] ; then
-    echo "=> Profile not found. Tried $NVM_PROFILE (as defined in \$PROFILE), ~/.bashrc, ~/.bash_profile, ~/.zshrc, and ~/.profile."
+  if [ $NVM_PROFILE != 0 ] ; then
+    echo "=> Profile not found. Tried Profile (as defined in \$PROFILE), ~/.bashrc, ~/.bash_profile, ~/.zshrc, and ~/.profile."
     echo "=> Create one of them and run this script again"
-    echo "=> Create it (touch $NVM_PROFILE) and run this script again"
+    echo "=> Create it (touch .bashrc) and run this script again"
     echo "   OR"
     echo "=> Append the following lines to the correct file yourself:"
     printf "$SOURCE_STR"
     echo
-  else
-    if ! grep -qc 'nvm.sh' "$NVM_PROFILE"; then
-      echo "=> Appending source string to $NVM_PROFILE"
-      printf "$SOURCE_STR\n" >> "$NVM_PROFILE"
-    else
-      echo "=> Source string already in $NVM_PROFILE"
-    fi
   fi
 
   echo "=> Close and reopen your terminal to start using nvm"
