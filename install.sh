@@ -101,6 +101,8 @@ install_nvm_as_script() {
 }
 
 nvm_add_profile() {
+  echo $1
+  echo $2
   if ! grep -qc 'nvm.sh' "$1"; then
       echo "=> Appending source string to $1"
       printf "$2\n" >> "$1"
@@ -117,6 +119,7 @@ nvm_add_profile() {
 #
 nvm_detect_profile() {
   found=1
+  echo $1
   if [ -f "$PROFILE" ]; then
     nvm_add_profile "$PROFILE" $1
     found=0
@@ -166,7 +169,7 @@ nvm_do_install() {
     install_nvm_as_script
   fi
 
-  echo "\nNVM Download Complete\n"
+  echo "NVM Download Complete"
 
   local NVM_PROFILE
   
