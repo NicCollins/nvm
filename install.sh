@@ -101,8 +101,6 @@ install_nvm_as_script() {
 }
 
 nvm_add_profile() {
-  echo $1
-  echo $2
   if ! grep -qc 'nvm.sh' "$1"; then
       echo "=> Appending source string to $1"
       printf "$2\n" >> "$1"
@@ -119,25 +117,24 @@ nvm_add_profile() {
 #
 nvm_detect_profile() {
   found=1
-  echo $1
   if [ -f "$PROFILE" ]; then
-    nvm_add_profile "$PROFILE" $1
+    nvm_add_profile "$PROFILE" "$1"
     found=0
   else 
     if [ -f "$HOME/.bashrc" ]; then
-      nvm_add_profile "$HOME/.bashrc" $1
+      nvm_add_profile "$HOME/.bashrc" "$1"
       found=0
     fi
     if [ -f "$HOME/.bash_profile" ]; then
-      nvm_add_profile "$HOME/.bash_profile" $1
+      nvm_add_profile "$HOME/.bash_profile" "$1"
       found=0
     fi
     if [ -f "$HOME/.zshrc" ]; then
-      nvm_add_profile "$HOME/.zshrc" $1
+      nvm_add_profile "$HOME/.zshrc" "$1"
       found=0
     fi
     if [ -f "$HOME/.profile" ]; then
-      nvm_add_profile "$HOME/.profile" $1
+      nvm_add_profile "$HOME/.profile" "$1"
       found=0
     fi
   fi
@@ -175,11 +172,8 @@ nvm_do_install() {
   
   SOURCE_STR="\nexport NVM_DIR=\"$NVM_DIR\"\n[ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"  # This loads nvm"
   
-  echo $SOURCE_STR
-  
-  NVM_PROFILE=$(nvm_detect_profile $SOURCE_STR)
-  
-  echo $NVM_PROFILE
+  nvm_detect_profile "$SOURCE_STR"
+  NVM_PROFILE=$?
 
   if [ $NVM_PROFILE -gt "0" ] ; then
     echo "=> Profile not found. Tried Profile (as defined in \$PROFILE), ~/.bashrc, ~/.bash_profile, ~/.zshrc, and ~/.profile."
