@@ -143,7 +143,7 @@ nvm_detect_profile() {
 nvm_do_install() {
   if [ -z "$METHOD" ]; then
     # Autodetect install method
-    if nvm_has "git"; then:
+    if nvm_has "git"; then
       install_nvm_from_git
     elif nvm_has "nvm_download"; then
       install_nvm_as_script
