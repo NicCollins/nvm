@@ -116,28 +116,29 @@ nvm_add_profile() {
 # Otherwise, an empty string is returned
 #
 nvm_detect_profile() {
-  found = 1
+  found=1
   if [ -f "$PROFILE" ]; then
     nvm_add_profile "$PROFILE" $1
-    found = 0
+    found=0
   else 
     if [ -f "$HOME/.bashrc" ]; then
       nvm_add_profile "$HOME/.bashrc" $1
-      found = 0
+      found=0
     fi
     if [ -f "$HOME/.bash_profile" ]; then
       nvm_add_profile "$HOME/.bash_profile" $1
-      found = 0
+      found=0
     fi
     if [ -f "$HOME/.zshrc" ]; then
       nvm_add_profile "$HOME/.zshrc" $1
-      found = 0
+      found=0
     fi
     if [ -f "$HOME/.profile" ]; then
       nvm_add_profile "$HOME/.profile" $1
-      found = 0
+      found=0
     fi
   fi
+  return $found
 }
 
 nvm_do_install() {
