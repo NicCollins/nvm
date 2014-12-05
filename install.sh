@@ -175,9 +175,13 @@ nvm_do_install() {
   
   SOURCE_STR="\nexport NVM_DIR=\"$NVM_DIR\"\n[ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"  # This loads nvm"
   
+  echo $SOURCE_STR
+  
   NVM_PROFILE=$(nvm_detect_profile $SOURCE_STR)
+  
+  echo $NVM_PROFILE
 
-  if [ $NVM_PROFILE != 0 ] ; then
+  if [ $NVM_PROFILE -gt "0" ] ; then
     echo "=> Profile not found. Tried Profile (as defined in \$PROFILE), ~/.bashrc, ~/.bash_profile, ~/.zshrc, and ~/.profile."
     echo "=> Create one of them and run this script again"
     echo "=> Create it (touch .bashrc) and run this script again"
